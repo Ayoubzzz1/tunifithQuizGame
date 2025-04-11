@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "670620250477",
+    "project_id": "tuni-c59cd",
+    "storage_bucket": "tuni-c59cd.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:670620250477:android:1c6507d5cab7327682ea64",
+        "android_client_info": {
+          "package_name": "com.example.tunifith"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCnP9wuU0W19acNsq5O7I5HZiPgs0csuIU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:670620250477:android:51789ed0bb7cfdd582ea64",
+        "android_client_info": {
+          "package_name": "com.tun.tunifith"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCnP9wuU0W19acNsq5O7I5HZiPgs0csuIU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
