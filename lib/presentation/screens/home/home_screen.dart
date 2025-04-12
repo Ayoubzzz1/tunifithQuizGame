@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../Play//game_setup.dart'; // Add this import
+import '../Play/game_setup.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -11,13 +11,22 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   void _showSocialLinkMessage(String platform) {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Opening $platform page')),
+      SnackBar(
+        content: Text('Opening $platform page'),
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10),
+        ),
+      ),
     );
-    // Later you can implement actual link opening after adding url_launcher dependency
   }
 
   @override
   Widget build(BuildContext context) {
+    final primaryColor = Theme
+        .of(context)
+        .primaryColor;
+
     return Scaffold(
       body: Container(
         decoration: BoxDecoration(
@@ -25,8 +34,8 @@ class _HomeScreenState extends State<HomeScreen> {
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
-              Theme.of(context).primaryColor,
-              Theme.of(context).primaryColor.withOpacity(0.7),
+              primaryColor,
+              primaryColor.withOpacity(0.7),
               Colors.white,
             ],
             stops: const [0.0, 0.3, 0.6],
@@ -34,15 +43,24 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         child: SafeArea(
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
+            padding: const EdgeInsets.symmetric(horizontal: 24.0),
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                const SizedBox(height: 20),
-                // Game logo
-                Center(
-                  child: Hero(
-                    tag: 'logo',
+                const SizedBox(height: 30),
+                // Enhanced Logo with subtle animation
+                Hero(
+                  tag: 'logo',
+                  child: Container(
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color: primaryColor.withOpacity(0.5),
+                          blurRadius: 20,
+                          spreadRadius: 5,
+                        ),
+                      ],
+                    ),
                     child: Image.asset(
                       'assets/images/splash_logo.png',
                       height: 150,
@@ -50,78 +68,94 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ),
                 const SizedBox(height: 20),
-                // Game title
-                const Center(
-                  child: Text(
+                // Game title with better typography
+                ShaderMask(
+                  shaderCallback: (bounds) =>
+                      LinearGradient(
+                        colors: [Colors.white, Colors.white.withOpacity(0.8)],
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                      ).createShader(bounds),
+                  child: const Text(
                     'Tunisia Guess Game',
                     style: TextStyle(
-                      fontSize: 28,
+                      fontSize: 32,
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
                       shadows: [
                         Shadow(
-                          color: Colors.black26,
+                          color: Colors.black45,
                           offset: Offset(0, 2),
-                          blurRadius: 4,
+                          blurRadius: 8,
                         ),
                       ],
                     ),
                   ),
                 ),
-                const SizedBox(height: 60),
-                // Play button
-                _buildMenuButton(
-                  title: 'Play',
-                  icon: Icons.play_circle_filled,
-                  onTap: () {
-                    // Navigate to the game setup screen
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (context) => const GameSetupScreen(),
-                      ),
-                    );
-                  },
-                  color: Colors.green[700]!,
-                ),
-                const SizedBox(height: 24),
-                // Rules button
-                _buildMenuButton(
-                  title: 'Rules',
-                  icon: Icons.rule,
-                  onTap: () {
-                    // Navigate to rules screen
-                    // Navigator.of(context).pushNamed('/rules');
-                  },
-                  color: Colors.blue[700]!,
-                ),
-                const SizedBox(height: 24),
-                // Settings button
-                _buildMenuButton(
-                  title: 'Settings',
-                  icon: Icons.settings,
-                  onTap: () {
-                    // Navigate to settings screen
-                    // Navigator.of(context).pushNamed('/settings');
-                  },
-                  color: Colors.orange[700]!,
-                ),
-                const Spacer(),
-                // Social media links
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 20.0),
-                  child: Row(
+                const SizedBox(height: 40),
+                // Menu buttons with enhanced styling
+                Expanded(
+                  child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      _buildSocialButton(
-                        icon: Icons.facebook,
-                        color: const Color(0xFF1877F2),
-                        onTap: () => _showSocialLinkMessage('Facebook'),
+                      _buildMenuButton(
+                        title: 'Play',
+                        icon: Icons.play_circle_fill_rounded,
+                        onTap: () =>
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (
+                                  context) => const GameSetupScreen()),
+                            ),
+                        color: Colors.green[700]!,
+                        isFirst: true,
                       ),
-                      const SizedBox(width: 24),
-                      _buildSocialButton(
-                        icon: Icons.camera_alt,
-                        color: const Color(0xFFE1306C),
-                        onTap: () => _showSocialLinkMessage('Instagram'),
+                      const SizedBox(height: 20),
+                      _buildMenuButton(
+                        title: 'Rules',
+                        icon: Icons.menu_book_rounded,
+                        onTap: () {},
+                        color: Colors.blue[700]!,
+                      ),
+                      const SizedBox(height: 20),
+                      _buildMenuButton(
+                        title: 'Settings',
+                        icon: Icons.settings_rounded,
+                        onTap: () {},
+                        color: Colors.orange[700]!,
+                        isLast: true,
+                      ),
+                    ],
+                  ),
+                ),
+                // Social media section with better styling
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 30),
+                  child: Column(
+                    children: [
+                      const Text(
+                        'Follow us on',
+                        style: TextStyle(
+                          color: Colors.white70,
+                          fontSize: 14,
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          _buildSocialButton(
+                            icon: Icons.facebook,
+                            color: const Color(0xFF1877F2),
+                            onTap: () => _showSocialLinkMessage('Facebook'),
+                          ),
+                          const SizedBox(width: 30),
+                          _buildSocialButton(
+                            icon: Icons.camera_alt,
+                            color: const Color(0xFFE1306C),
+                            onTap: () => _showSocialLinkMessage('Instagram'),
+                          ),
+                        ],
                       ),
                     ],
                   ),
@@ -139,25 +173,42 @@ class _HomeScreenState extends State<HomeScreen> {
     required IconData icon,
     required VoidCallback onTap,
     required Color color,
+    bool isFirst = false,
+    bool isLast = false,
   }) {
-    return Container(
-      height: 80,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: color.withOpacity(0.3),
-            blurRadius: 8,
-            offset: const Offset(0, 4),
-          ),
-        ],
+    return Material(
+      elevation: 4,
+      borderRadius: BorderRadius.vertical(
+        top: isFirst ? const Radius.circular(20) : Radius.zero,
+        bottom: isLast ? const Radius.circular(20) : Radius.zero,
       ),
-      child: Material(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
+      shadowColor: color.withOpacity(0.3),
+      child: Container(
+        height: 80,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.vertical(
+            top: isFirst ? const Radius.circular(20) : Radius.zero,
+            bottom: isLast ? const Radius.circular(20) : Radius.zero,
+          ),
+          border: Border.all(
+            color: Colors.white.withOpacity(0.2),
+            width: 1,
+          ),
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              Colors.white.withOpacity(0.95),
+              Colors.white.withOpacity(0.98),
+            ],
+          ),
+        ),
         child: InkWell(
           onTap: onTap,
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.vertical(
+            top: isFirst ? const Radius.circular(20) : Radius.zero,
+            bottom: isLast ? const Radius.circular(20) : Radius.zero,
+          ),
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20),
             child: Row(
@@ -165,12 +216,17 @@ class _HomeScreenState extends State<HomeScreen> {
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: color.withOpacity(0.1),
+                    gradient: LinearGradient(
+                      colors: [
+                        color.withOpacity(0.1),
+                        color.withOpacity(0.2),
+                      ],
+                    ),
                     shape: BoxShape.circle,
                   ),
                   child: Icon(
                     icon,
-                    size: 32,
+                    size: 30,
                     color: color,
                   ),
                 ),
@@ -186,7 +242,8 @@ class _HomeScreenState extends State<HomeScreen> {
                 const Spacer(),
                 Icon(
                   Icons.arrow_forward_ios,
-                  color: color.withOpacity(0.5),
+                  size: 20,
+                  color: color.withOpacity(0.7),
                 ),
               ],
             ),
@@ -201,28 +258,38 @@ class _HomeScreenState extends State<HomeScreen> {
     required Color color,
     required VoidCallback onTap,
   }) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(30),
-      child: Container(
-        padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          shape: BoxShape.circle,
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.1),
-              blurRadius: 8,
-              offset: const Offset(0, 2),
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 200),
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        boxShadow: [
+          BoxShadow(
+            color: color.withOpacity(0.3),
+            blurRadius: 10,
+            spreadRadius: 0,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Material(
+        shape: const CircleBorder(),
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(30),
+          child: Container(
+            padding: const EdgeInsets.all(15),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              shape: BoxShape.circle,
             ),
-          ],
-        ),
-        child: Icon(
-          icon,
-          size: 30,
-          color: color,
+            child: Icon(
+              icon,
+              size: 28,
+              color: color,
+            ),
+          ),
         ),
       ),
     );
-  }
+  } // This closing brace was missing
 }
