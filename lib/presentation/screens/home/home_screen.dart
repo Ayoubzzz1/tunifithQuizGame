@@ -112,7 +112,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                       const SizedBox(height: 20),
                       _buildMenuButton(
-                        title: 'Rules',
+                        title: 'Game rules',
                         icon: Icons.menu_book_rounded,
                         onTap: () {},
                         color: Colors.blue[700]!,
