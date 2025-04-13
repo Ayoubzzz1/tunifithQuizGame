@@ -214,7 +214,7 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
                                     ],
                                   ),
                                   child: Image.asset(
-                                    'assets/images/splash_logo.png',
+                                    'assets/images/logo.png',
                                     height: 200,
                                   ),
                                 ),

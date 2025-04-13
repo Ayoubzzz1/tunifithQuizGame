@@ -155,7 +155,7 @@ class _ThemeQuestionsScreenState extends State<ThemeQuestionsScreen> {
                       return CategoryToggle(
                         category: category,
                         isSelected: isSelected,
-                        icon: _categoryIcons[category] ?? Icons.category,
+                        icon: Icons.add,
                         onToggle: (value) => _toggleCategory(category, value),
                       );
                     },
