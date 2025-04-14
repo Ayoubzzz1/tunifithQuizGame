@@ -9,6 +9,7 @@ import 'action_button.dart';
 import 'game_question.dart';
 import 'suggestion.dart';
 import 'game_setup.dart';
+
 class GameScreen extends StatefulWidget {
   final int numTeams;
   final int numRounds;
@@ -39,6 +40,8 @@ class _GameScreenState extends State<GameScreen> {
   List<int> _teamScores = [];
   int _questionIndex = 0;
   bool _showResults = false;
+  bool _showProgressLine = false;
+  bool _isLastTurn = false;
 
   Timer? _timer;
 
@@ -146,6 +149,11 @@ class _GameScreenState extends State<GameScreen> {
         _timeRemaining = 60;
         _teamScore = 0;
         _showResults = false;
+        _isTimerRunning = false;
+        _showProgressLine = false;
+
+        // Check if this is the last turn in the game
+        _isLastTurn = (_currentRound == widget.numRounds && _currentTeam == widget.numTeams);
       });
     } else {
       // No more questions - game over
@@ -194,6 +202,9 @@ class _GameScreenState extends State<GameScreen> {
 
       // Update team score
       _teamScores[_currentTeam - 1] += _teamScore;
+
+      // Show progress line except for the last turn
+      _showProgressLine = !_isLastTurn;
     });
   }
 
@@ -265,51 +276,223 @@ class _GameScreenState extends State<GameScreen> {
             padding: const EdgeInsets.all(24.0),
             child: _currentQuestion == null
                 ? const Center(child: Text('No questions available'))
-                : Column(
-              children: [
-                // Timer and score display
-                TimerScoreDisplay(
-                  timeRemaining: _timeRemaining,
-                  teamScore: _teamScore,
-                ),
-
-                const SizedBox(height: 30),
-
-                // Question
-                QuestionDisplay(
-                  theme: _currentQuestion!.theme,
-                  question: _currentQuestion!.question,
-                ),
-
-                const SizedBox(height: 30),
-
-                // Suggestions
-                Expanded(
-                  child: SuggestionsList(
-                    suggestions: _currentSuggestions,
-                    isTimerRunning: _isTimerRunning,
-                    showResults: _showResults,
-                    onSuggestionSelected: _selectSuggestion,
-                  ),
-                ),
-
-                const SizedBox(height: 16),
-
-                // Action button
-                ActionButton(
-                  isTimerRunning: _isTimerRunning,
-                  showResults: _showResults,
-                  currentTeam: _currentTeam,
-                  numTeams: widget.numTeams,
-                  onStartTurn: _startTimer,
-                  onEndTurn: _endTurn,
-                  onNextTurn: _nextTurn,
-                ),
-              ],
-            ),
+                : _showProgressLine
+                ? _buildProgressLineScreen()
+                : _buildGameScreen(),
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildGameScreen() {
+    return Column(
+      children: [
+        // Timer and score display
+        TimerScoreDisplay(
+          timeRemaining: _timeRemaining,
+          teamScore: _teamScore,
+        ),
+
+        const SizedBox(height: 30),
+
+        // Question
+        QuestionDisplay(
+          theme: _currentQuestion!.theme,
+          question: _currentQuestion!.question,
+        ),
+
+        const SizedBox(height: 30),
+
+        // Suggestions - only shown when timer is running or results are shown
+        Expanded(
+          child: _isTimerRunning || _showResults
+              ? SuggestionsList(
+            suggestions: _currentSuggestions,
+            isTimerRunning: _isTimerRunning,
+            showResults: _showResults,
+            onSuggestionSelected: _selectSuggestion,
+          )
+              : const Center(
+            child: Text(
+              'Press Start to begin the round',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
+        ),
+
+        const SizedBox(height: 16),
+
+        // Action buttons - Start or Next Round
+        if (!_isTimerRunning && !_showResults)
+          Center(
+            child: ElevatedButton(
+              onPressed: _startTimer,
+              style: ElevatedButton.styleFrom(
+                shape: const CircleBorder(),
+                padding: const EdgeInsets.all(60),
+                backgroundColor: Theme.of(context).primaryColor,
+              ),
+              child: const Text(
+                'START',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 40,
+                ),
+              ),
+            ),
+          ),
+
+        if (_showResults && _isLastTurn)
+          ElevatedButton(
+            onPressed: _nextTurn,
+            style: ElevatedButton.styleFrom(
+              padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+              backgroundColor: Theme.of(context).primaryColor,
+            ),
+            child: const Text(
+              'See Results',
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+                fontSize: 16,
+              ),
+            ),
+          ),
+      ],
+    );
+  }
+
+  Widget _buildProgressLineScreen() {
+    // Calculate highest score to determine max value for progress indicators
+    int highestScore = _teamScores.reduce((a, b) => a > b ? a : b);
+    highestScore = highestScore > 0 ? highestScore : 100; // Default max if all scores are 0
+
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        const Text(
+          'Team Scores',
+          style: TextStyle(
+            fontSize: 28,
+            fontWeight: FontWeight.bold,
+            color: Colors.black87,
+          ),
+        ),
+
+        const SizedBox(height: 40),
+
+        // Team scores with progress bars
+        ListView.builder(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          itemCount: widget.numTeams,
+          itemBuilder: (context, index) {
+            final teamNumber = index + 1;
+            final teamScore = _teamScores[index];
+            final progress = teamScore / highestScore;
+
+            // Highlight current team that just played
+            final bool isCurrentTeam = teamNumber == _currentTeam;
+
+            return Padding(
+              padding: const EdgeInsets.symmetric(vertical: 12.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 8.0),
+                    child: Text(
+                      'Team $teamNumber: $teamScore points',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: isCurrentTeam ? FontWeight.bold : FontWeight.normal,
+                        color: isCurrentTeam ? Theme.of(context).primaryColor : Colors.black87,
+                      ),
+                    ),
+                  ),
+                  Stack(
+                    children: [
+                      // Background container
+                      Container(
+                        height: 24,
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                          color: Colors.grey.shade200,
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      // Animated progress container
+                      LayoutBuilder(
+                        builder: (context, constraints) {
+                          return TweenAnimationBuilder<double>(
+                            tween: Tween<double>(begin: 0, end: progress),
+                            duration: const Duration(milliseconds: 1500),
+                            curve: Curves.easeOutQuart,
+                            builder: (context, value, child) {
+                              return Container(
+                                height: 24,
+                                width: constraints.maxWidth * value,
+                                decoration: BoxDecoration(
+                                  gradient: LinearGradient(
+                                    colors: isCurrentTeam
+                                        ? [Theme.of(context).primaryColor, Colors.blue]
+                                        : [Colors.blueGrey, Colors.blueGrey.shade300],
+                                    begin: Alignment.centerLeft,
+                                    end: Alignment.centerRight,
+                                  ),
+                                  borderRadius: BorderRadius.circular(12),
+                                  boxShadow: isCurrentTeam
+                                      ? [
+                                    BoxShadow(
+                                      color: Theme.of(context).primaryColor.withOpacity(0.4),
+                                      blurRadius: 8,
+                                      offset: const Offset(0, 4),
+                                    ),
+                                  ]
+                                      : null,
+                                ),
+                              );
+                            },
+                          );
+                        },
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            );
+          },
+        ),
+
+        const SizedBox(height: 60),
+
+        // Continue button
+        ElevatedButton(
+          onPressed: _nextTurn,
+          style: ElevatedButton.styleFrom(
+            padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 16),
+            backgroundColor: Theme.of(context).primaryColor,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(30),
+            ),
+            elevation: 8,
+            shadowColor: Theme.of(context).primaryColor.withOpacity(0.5),
+          ),
+          child: Text(
+            _currentTeam < widget.numTeams ? 'Next Team' : 'Next Round',
+            style: const TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+              fontSize: 18,
+            ),
+          ),
+        ),
+      ],
     );
   }
 }
