@@ -11,25 +11,49 @@ import 'presentation/screens/Play/music_service.dart'; // 🎶 Import your music
 import 'presentation/screens/Play/seetings.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
 
-  // Initialize music service based on saved preferences
-  final musicService = MusicService();
-  await musicService.initializeMusic();
+  try {
+    // Check if app has crashed repeatedly
+    final prefs = await SharedPreferences.getInstance();
+    int crashCount = prefs.getInt('crash_count') ?? 0;
 
-  // Check user preference before playing music
-  final prefs = await SharedPreferences.getInstance();
-  bool isMusicEnabled = prefs.getBool('isMusicEnabled') ?? true;
+    if (crashCount > 3) {
+      // Reset all preferences if app crashed multiple times
+      await prefs.clear();
+      await prefs.setInt('crash_count', 0);
+      print('Reset app due to multiple crashes');
+    } else {
+      // Increment crash counter (we'll reset it after successful load)
+      await prefs.setInt('crash_count', crashCount + 1);
+    }
 
-  if (isMusicEnabled) {
-    await musicService.playMusic();
+    // Continue with Firebase and music initialization
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+
+    // Initialize music service with try-catch
+    try {
+      final musicService = MusicService();
+      await musicService.initializeMusic();
+
+      bool isMusicEnabled = prefs.getBool('isMusicEnabled') ?? true;
+      if (isMusicEnabled) {
+        await musicService.playMusic();
+      }
+    } catch (e) {
+      print('Music initialization error: $e');
+    }
+
+    // Mark successful app start by resetting crash counter
+    await prefs.setInt('crash_count', 0);
+
+  } catch (e) {
+    print('Initialization error: $e');
   }
 
   runApp(const TunisiaGuessGame());
 }
-
 class TunisiaGuessGame extends StatelessWidget {
   const TunisiaGuessGame({super.key});
 
