@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'category_toggle.dart';
 import 'theme_selection.dart';
 
 class ThemeQuestionsScreen extends StatefulWidget {
