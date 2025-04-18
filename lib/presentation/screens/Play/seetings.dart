@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import '../Play/music_service.dart';
 import 'package:flutter/services.dart';
 import 'soundservice.dart';
@@ -17,9 +16,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
   final MusicService _musicService = MusicService();
   final SoundService _soundService = SoundService();
 
-  // Memory cache for preferences to avoid excessive disk reads
-  static final Map<String, bool> _prefsCache = {};
-
   @override
   void initState() {
     super.initState();
@@ -27,60 +23,32 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   Future<void> _loadSettings() async {
-    // Try to load from memory cache first
-    if (_prefsCache.containsKey('isMusicEnabled') &&
-        _prefsCache.containsKey('isSoundEffectsEnabled')) {
-      setState(() {
-        isMusicEnabled = _prefsCache['isMusicEnabled']!;
-        isSoundEffectsEnabled = _prefsCache['isSoundEffectsEnabled']!;
-      });
-      return;
-    }
-
-    // Otherwise load from shared preferences
-    final prefs = await SharedPreferences.getInstance();
-    final musicEnabled = prefs.getBool('isMusicEnabled') ?? true;
-    final soundEnabled = prefs.getBool('isSoundEffectsEnabled') ?? true;
-
-    // Update memory cache
-    _prefsCache['isMusicEnabled'] = musicEnabled;
-    _prefsCache['isSoundEffectsEnabled'] = soundEnabled;
-
+    // Load settings directly from services
     setState(() {
-      isMusicEnabled = musicEnabled;
-      isSoundEffectsEnabled = soundEnabled;
+      isMusicEnabled = _musicService.isMusicEnabled;
+      isSoundEffectsEnabled = _soundService.isSoundEnabled;
     });
   }
 
   Future<void> _saveMusicSetting(bool value) async {
-    // Update memory cache immediately
-    _prefsCache['isMusicEnabled'] = value;
-
-    // Save to disk
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('isMusicEnabled', value);
-
     setState(() {
       isMusicEnabled = value;
     });
 
+    // Update the music service's state
+    await _musicService.setMusicEnabled(value);
+
     if (value) {
-      _musicService.resumeMusic();
+      await _musicService.resumeMusic();
     } else {
-      _musicService.pauseMusic();
+      await _musicService.pauseMusic();
     }
   }
-
   Future<void> _saveSoundEffectsSetting(bool value) async {
-    // Update memory cache immediately
-    _prefsCache['isSoundEffectsEnabled'] = value;
-
-    // Save to disk
-    await _soundService.setSoundEnabled(value);
-
     setState(() {
       isSoundEffectsEnabled = value;
     });
+    await _soundService.setSoundEnabled(value);
   }
 
   @override
@@ -305,7 +273,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           subtitle: 'Support us with a rating',
                           icon: Icons.star,
                           onTap: () {
-                            // Add rating functionality
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(content: Text('Rating the app...')),
                             );
@@ -317,7 +284,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           subtitle: 'Share with friends',
                           icon: Icons.share,
                           onTap: () {
-                            // Add share functionality
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(content: Text('Sharing the app...')),
                             );
@@ -367,7 +333,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
         trailing: Switch.adaptive(
           value: value,
           onChanged: (newValue) {
-            // Add haptic feedback
             HapticFeedback.lightImpact();
             onChanged(newValue);
           },

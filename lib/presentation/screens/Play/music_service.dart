@@ -1,5 +1,4 @@
 import 'package:audioplayers/audioplayers.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class MusicService {
   static final MusicService _instance = MusicService._internal();
@@ -11,18 +10,11 @@ class MusicService {
 
   MusicService._internal() {
     _audioPlayer = AudioPlayer();
-    _audioPlayer.setReleaseMode(ReleaseMode.loop); // Loop the music
-    _loadSettings();
-  }
-
-  Future<void> _loadSettings() async {
-    final prefs = await SharedPreferences.getInstance();
-    _isMusicEnabled = prefs.getBool('isMusicEnabled') ?? true;
+    _audioPlayer.setReleaseMode(ReleaseMode.loop);
   }
 
   Future<void> initializeMusic() async {
     if (!_isInitialized) {
-      await _loadSettings();
       if (_isMusicEnabled) {
         await _audioPlayer.setSource(AssetSource('audio/background.mp3'));
       }
@@ -54,9 +46,6 @@ class MusicService {
 
   Future<void> setMusicEnabled(bool enabled) async {
     _isMusicEnabled = enabled;
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('isMusicEnabled', enabled);
-
     if (enabled) {
       await resumeMusic();
     } else {
