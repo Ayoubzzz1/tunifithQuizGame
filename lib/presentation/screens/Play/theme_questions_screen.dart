@@ -14,14 +14,14 @@ class _ThemeQuestionsScreenState extends State<ThemeQuestionsScreen> {
   Map<String, bool> _categories = {'Select All': false};
   final Map<String, IconData> _categoryIcons = {
     'Select All': Icons.select_all,
-    'Movies': Icons.movie_outlined,
-    'Sports': Icons.sports_soccer_outlined,
-    'Science': Icons.science_outlined,
-    'History': Icons.history_edu_outlined,
-    'Geography': Icons.public_outlined,
-    'Music': Icons.music_note_outlined,
-    'Art': Icons.palette_outlined,
-    'Food': Icons.restaurant_outlined,
+    'السينما والتلفزيون التونسي': Icons.movie_outlined,
+    'الرياضة في تونس': Icons.sports_soccer_outlined,
+    'العلوم في تونس': Icons.science_outlined,
+    'تاريخ تونس': Icons.history_edu_outlined,
+    'جيولوجيا تونس': Icons.public_outlined,
+    'موسيقة تونسية': Icons.music_note_outlined,
+    'الفن التونسي': Icons.palette_outlined,
+    'الثقافة التونسية': Icons.group_outlined               ,
     'Technology': Icons.devices_outlined,
     'Literature': Icons.book_outlined,
   };
