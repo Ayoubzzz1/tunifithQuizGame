@@ -23,7 +23,7 @@ void main() async {
       final musicService = MusicService();
       await musicService.initializeMusic();
 
-      bool isMusicEnabled = true; // Default to true
+      const bool isMusicEnabled = true; // Default to true
       if (isMusicEnabled) {
         await musicService.playMusic();
       }

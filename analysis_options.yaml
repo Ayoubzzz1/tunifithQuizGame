@@ -9,6 +9,7 @@
 # packages, and plugins designed to encourage good coding practices.
 
 linter:
+
   # The lint rules applied to this project can be customized in the
   # section below to disable rules from the `package:flutter_lints/flutter.yaml`
   # included above or to enable additional rules. A list of all available lints
@@ -20,6 +21,28 @@ linter:
   # `// ignore_for_file: name_of_lint` syntax on the line or in the file
   # producing the lint.
   rules:
+    # === Critical Performance ===
+    prefer_const_constructors: true       # Use `const` widgets to avoid rebuilds
+    prefer_const_declarations: true       # Mark immutable values as `const`
+    avoid_unnecessary_containers: true    # Prefer SizedBox for empty space
+
+    # === Null Safety ===
+    unnecessary_nullable_parameters: true # Remove redundant `?` in null-safe code
+    avoid_null_checks_in_equality_ops: true # Warn for `== null` checks
+
+    # === Code Quality ===
+    avoid_print: true                    # Use `debugPrint` in Flutter
+    prefer_final_locals: true            # Use `final` for unmodified variables
+    use_key_in_widget_constructors: true  # Require keys in widget constructors
+
+    # === Maintenance ===
+    prefer_typing_uninitialized_variables: true # Explicitly type variables
+    omit_local_variable_types: false      # Show variable types for clarity
+
+    # === Disabled (Too Opinionated) ===
+    always_specify_types: false           # Allow inferred types
+    avoid_shadowing_type_parameters: false # Rarely needed
+    curly_braces_in_flow_control_structures: false # Allow single-line if/for
     # avoid_print: false  # Uncomment to disable the `avoid_print` rule
     # prefer_single_quotes: true  # Uncomment to enable the `prefer_single_quotes` rule
 

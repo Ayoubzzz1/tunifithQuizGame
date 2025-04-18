@@ -118,8 +118,8 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
           }
 
           return Container(
-            decoration: BoxDecoration(
-              gradient: const LinearGradient(
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
                 colors: [

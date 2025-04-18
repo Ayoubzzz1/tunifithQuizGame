@@ -128,7 +128,7 @@ class _GameSetupScreenState extends State<GameSetupScreen> {
                             max: 20,
                             divisions: 3,
                             onChanged: (value) {
-                              int roundedValue = (value / 5).round() * 5;
+                              final int roundedValue = (value / 5).round() * 5;
                               setState(() {
                                 _numRounds = roundedValue;
                               });

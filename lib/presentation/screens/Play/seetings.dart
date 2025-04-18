@@ -48,9 +48,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
     setState(() {
       isSoundEffectsEnabled = value;
     });
-    await _soundService.setSoundEnabled(value);
+    _soundService.setSoundEnabled(value); // Remove await
   }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
